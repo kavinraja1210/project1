@@ -1,0 +1,147 @@
+# ==========================================================
+# DOCUMENT CLASSIFIER USING MACHINE LEARNING
+# ==========================================================
+
+# Install required libraries (Run this once if not installed)
+# !pip install pandas scikit-learn
+
+# Import libraries
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import accuracy_score, classification_report
+
+# ==========================================================
+# STEP 1: Create Dataset
+# ==========================================================
+
+data = {
+    "text": [
+        "The team won the football match",
+        "The player scored a brilliant goal",
+        "India won the cricket world cup",
+        "The coach announced the playing eleven",
+
+        "The government passed a new law",
+        "The election results were declared",
+        "The parliament discussed the budget",
+        "The minister addressed the media",
+
+        "Artificial Intelligence is the future",
+        "Python is used for machine learning",
+        "Cloud computing is becoming popular",
+        "Cyber security protects computer systems",
+
+        "The movie received excellent reviews",
+        "The actor won the best award",
+        "The music concert was amazing",
+        "The director released a new film"
+    ],
+
+    "category": [
+        "Sports",
+        "Sports",
+        "Sports",
+        "Sports",
+
+        "Politics",
+        "Politics",
+        "Politics",
+        "Politics",
+
+        "Technology",
+        "Technology",
+        "Technology",
+        "Technology",
+
+        "Entertainment",
+        "Entertainment",
+        "Entertainment",
+        "Entertainment"
+    ]
+}
+
+df = pd.DataFrame(data)
+
+print("=========== DATASET ===========")
+print(df)
+
+# ==========================================================
+# STEP 2: Split Dataset
+# ==========================================================
+
+X_train, X_test, y_train, y_test = train_test_split(
+    df["text"],
+    df["category"],
+    test_size=0.25,
+    random_state=42
+)
+
+# ==========================================================
+# STEP 3: Create Machine Learning Pipeline
+# ==========================================================
+
+classifier = Pipeline([
+    ("tfidf", TfidfVectorizer()),
+    ("model", MultinomialNB())
+])
+
+# ==========================================================
+# STEP 4: Train Model
+# ==========================================================
+
+classifier.fit(X_train, y_train)
+
+print("\nModel Trained Successfully!")
+
+# ==========================================================
+# STEP 5: Test Model
+# ==========================================================
+
+predictions = classifier.predict(X_test)
+
+print("\n=========== TEST RESULTS ===========")
+print("Accuracy:", accuracy_score(y_test, predictions))
+
+print("\nClassification Report:\n")
+print(classification_report(y_test, predictions))
+
+# ==========================================================
+# STEP 6: Predict New Documents
+# ==========================================================
+
+print("\n=========== PREDICTIONS ===========")
+
+documents = [
+    "Python is the best programming language",
+    "The football team scored three goals",
+    "The Prime Minister announced a new policy",
+    "The actor acted in a blockbuster movie",
+    "Machine learning improves artificial intelligence",
+    "The cricket match was exciting"
+]
+
+for doc in documents:
+    prediction = classifier.predict([doc])[0]
+    print(f"Document : {doc}")
+    print(f"Category : {prediction}")
+    print("-" * 50)
+
+# ==========================================================
+# STEP 7: User Input
+# ==========================================================
+
+print("\n=========== DOCUMENT CLASSIFIER ===========")
+
+while True:
+    text = input("\nEnter a document (or type 'exit' to quit): ")
+
+    if text.lower() == "exit":
+        print("Thank you!")
+        break
+
+    category = classifier.predict([text])[0]
+
+    print("Predicted Category:", category)
